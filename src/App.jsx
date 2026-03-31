@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 import LandingPage from "./pages/LandingPage"
 import LoginPage from "./pages/LoginPage"
 import RegistroPage from "./pages/RegistroPage"
+import EspacioPage from "./pages/EspacioPage"
 
 export default function App() {
   return (
@@ -10,6 +11,7 @@ export default function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/registro" element={<RegistroPage />} />
+        <Route path="/espacio" element={<EspacioPage />} />
       </Routes>
     </BrowserRouter>
   )
