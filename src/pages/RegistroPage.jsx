@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react"
+import { useNavigate } from "react-router-dom"
+import { registrar, login, obtenerPerfil } from "../services/api"
 
 const temas = [
   {
@@ -28,6 +30,9 @@ export default function RegistroPage() {
   const [email, setEmail] = useState("")
   const [contrasena, setContrasena] = useState("")
   const [temaSeleccionado, setTemaSeleccionado] = useState("blanco")
+  const [error, setError] = useState("")
+  const [cargando, setCargando] = useState(false)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const saved = localStorage.getItem("tema")
@@ -49,9 +54,48 @@ export default function RegistroPage() {
     setPaso(2)
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Aquí irá la lógica de registro con la API
+    setError("")
+    setCargando(true)
+
+    try {
+      // Registrar usuario
+      const resRegistro = await registrar(email, contrasena)
+
+      if (!resRegistro.exito) {
+        setError(resRegistro.mensaje || "Error al registrar. Intenta de nuevo.")
+        setCargando(false)
+        return
+      }
+
+      // Login automático después del registro
+      const resLogin = await login(email, contrasena)
+
+      if (res.exito) {
+  localStorage.setItem("token", res.data.token)
+  localStorage.setItem("email", res.data.email)
+  
+  // Obtener API Key del perfil
+  try {
+    const perfil = await obtenerPerfil()
+    if (perfil.exito && perfil.data?.apiKey) {
+      localStorage.setItem("apiKey", perfil.data.apiKey)
+    }
+  } catch (e) {
+    console.error("Error obteniendo perfil:", e)
+  }
+  
+  navigate("/espacio")
+} else {
+        setError("Cuenta creada. Por favor inicia sesión.")
+        navigate("/login")
+      }
+    } catch {
+      setError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setCargando(false)
+    }
   }
 
   return (
@@ -73,7 +117,6 @@ export default function RegistroPage() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          {/* Logo */}
           <div className="mb-8 flex flex-col items-center">
             <div className="flex h-12 w-12 items-center justify-center" style={{
               clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -87,13 +130,11 @@ export default function RegistroPage() {
             </p>
           </div>
 
-          {/* Indicador de pasos */}
           <div className="mb-6 flex items-center justify-center gap-2">
             <div className={`h-2 w-8 rounded-full transition-colors ${paso >= 1 ? "bg-gray-900 dark:bg-white" : "bg-gray-200 dark:bg-gray-700"}`} />
             <div className={`h-2 w-8 rounded-full transition-colors ${paso >= 2 ? "bg-gray-900 dark:bg-white" : "bg-gray-200 dark:bg-gray-700"}`} />
           </div>
 
-          {/* Paso 1 */}
           {paso === 1 && (
             <form onSubmit={handleSiguiente} className="space-y-4">
               <div>
@@ -125,7 +166,6 @@ export default function RegistroPage() {
             </form>
           )}
 
-          {/* Paso 2 */}
           {paso === 2 && (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-3">
@@ -137,7 +177,6 @@ export default function RegistroPage() {
                         : "border-gray-200 dark:border-gray-700 hover:border-gray-400 dark:hover:border-gray-500"
                     }`}>
                     <div className="flex items-start gap-4">
-                      {/* Preview del tema */}
                       <div className={`flex h-14 w-20 flex-shrink-0 overflow-hidden rounded-lg ${tema.colores.bg}`}>
                         <div className={`w-5 ${tema.colores.sidebar}`} />
                         <div className="flex flex-1 flex-col gap-1 p-1.5">
@@ -162,14 +201,18 @@ export default function RegistroPage() {
                 ))}
               </div>
 
+              {error && (
+                <p className="text-sm text-red-500 text-center">{error}</p>
+              )}
+
               <div className="flex gap-3 pt-2">
                 <button type="button" onClick={() => setPaso(1)}
                   className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 px-4 py-2.5 text-sm font-medium text-gray-900 dark:text-white hover:bg-gray-50 dark:hover:bg-gray-800">
                   Atrás
                 </button>
-                <button type="submit"
-                  className="flex-1 rounded-lg bg-gray-900 dark:bg-white px-4 py-2.5 text-sm font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100">
-                  Crear mi espacio
+                <button type="submit" disabled={cargando}
+                  className="flex-1 rounded-lg bg-gray-900 dark:bg-white px-4 py-2.5 text-sm font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100 disabled:opacity-50">
+                  {cargando ? "Creando..." : "Crear mi espacio"}
                 </button>
               </div>
             </form>

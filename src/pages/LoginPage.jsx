@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import { login, obtenerPerfil } from "../services/api"
 
 export default function LoginPage() {
   const [isDark, setIsDark] = useState(false)
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [error, setError] = useState("")
+  const [cargando, setCargando] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -22,9 +25,39 @@ export default function LoginPage() {
     localStorage.setItem("tema", newIsDark ? "dark" : "light")
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    // Aquí irá la lógica de autenticación con la API
+    setError("")
+    setCargando(true)
+
+    try {
+      const res = await login(email, password)
+
+      if (res.exito) {
+  localStorage.setItem("token", res.data.token)
+  localStorage.setItem("email", res.data.email)
+  
+  // Obtener API Key del perfil
+  try {
+    const perfil = await obtenerPerfil()
+    console.log("Perfil response:", perfil)
+    if (perfil.exito && perfil.data?.apiKey) {
+      localStorage.setItem("apiKey", perfil.data.apiKey)
+      console.log("API Key guardada:", perfil.data.apiKey)
+    }
+  } catch (e) {
+    console.error("Error obteniendo perfil:", e)
+  }
+  
+  navigate("/espacio")
+} else {
+        setError("Email o contraseña incorrectos")
+      }
+    } catch {
+      setError("Error de conexión. Intenta de nuevo.")
+    } finally {
+      setCargando(false)
+    }
   }
 
   return (
@@ -46,7 +79,6 @@ export default function LoginPage() {
 
       <main className="flex flex-1 items-center justify-center px-4 py-12">
         <div className="w-full max-w-sm">
-          {/* Logo */}
           <div className="mb-8 flex flex-col items-center">
             <div className="flex h-12 w-12 items-center justify-center" style={{
               clipPath: "polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%)",
@@ -60,7 +92,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Formulario */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-900 dark:text-white">
@@ -90,9 +121,13 @@ export default function LoginPage() {
               </a>
             </div>
 
-            <button type="submit"
-              className="w-full rounded-lg bg-gray-900 dark:bg-white px-4 py-2.5 text-sm font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100">
-              Ingresar
+            {error && (
+              <p className="text-sm text-red-500 text-center">{error}</p>
+            )}
+
+            <button type="submit" disabled={cargando}
+              className="w-full rounded-lg bg-gray-900 dark:bg-white px-4 py-2.5 text-sm font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-100 disabled:opacity-50">
+              {cargando ? "Ingresando..." : "Ingresar"}
             </button>
           </form>
 
