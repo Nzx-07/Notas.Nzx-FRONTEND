@@ -2,6 +2,7 @@ import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import EditorNotas from "../components/EditorNotas"
 import { obtenerNotas, crearNota as crearNotaAPI, eliminarNota as eliminarNotaAPI } from "../services/api"
+import { obtenerNotas, crearNota as crearNotaAPI, eliminarNota as eliminarNotaAPI, actualizarNota } from "../services/api"
 
 // Iconos
 const PlusIcon = ({ className }) => (
@@ -75,7 +76,6 @@ const notasIniciales = []
 
 export default function EspacioPage() {
   const [isDark, setIsDark] = useState(false)
-  // ✅ AÑADIDO: estado para tema bosque
   const [esBosque, setEsBosque] = useState(false)
   const [sidebarAbierto, setSidebarAbierto] = useState(true)
   const [mobileSidebarAbierto, setMobileSidebarAbierto] = useState(false)
@@ -88,6 +88,7 @@ export default function EspacioPage() {
   const [creandoCarpeta, setCreandoCarpeta] = useState(false)
   const [nombreNuevaCarpeta, setNombreNuevaCarpeta] = useState("")
   const navigate = useNavigate()
+  const [guardandoRef] = useState({ timeout: null })
 
   useEffect(() => {
     const saved = localStorage.getItem("tema")
@@ -175,11 +176,21 @@ export default function EspacioPage() {
   }
 
   const actualizarContenido = (contenido) => {
-    if (!notaSeleccionada) return
-    const actualizada = { ...notaSeleccionada, contenido }
-    setNotaSeleccionada(actualizada)
-    setNotas(notas.map(n => n.id === actualizada.id ? actualizada : n))
-  }
+  if (!notaSeleccionada) return
+  const actualizada = { ...notaSeleccionada, contenido }
+  setNotaSeleccionada(actualizada)
+  setNotas(notas.map(n => n.id === actualizada.id ? actualizada : n))
+
+  // Guardado automático con debounce de 1 segundo
+  if (guardandoRef.timeout) clearTimeout(guardandoRef.timeout)
+  guardandoRef.timeout = setTimeout(async () => {
+    try {
+      await actualizarNota(actualizada.id, contenido)
+    } catch (e) {
+      console.error("Error guardando nota:", e)
+    }
+  }, 1000)
+}
 
   const eliminarNota = async (id) => {
     try {

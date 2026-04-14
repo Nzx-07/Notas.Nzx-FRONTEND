@@ -60,3 +60,13 @@ export const obtenerPerfil = async () => {
   })
   return res.json()
 }
+
+//Modificacion para agregar "PUT" en la API
+export const actualizarNota = async (id, contenido) => {
+  const res = await fetch(`${BASE_URL}/api/notas/${id}`, {
+    method: "PUT",
+    headers: headers(obtenerToken(), obtenerApiKey()),
+    body: JSON.stringify({ contenido }),
+  })
+  return res.json()
+}
