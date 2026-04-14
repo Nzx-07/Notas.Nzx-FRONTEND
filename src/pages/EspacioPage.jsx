@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import EditorNotas from "../components/EditorNotas"
-import { obtenerNotas, crearNota as crearNotaAPI, eliminarNota as eliminarNotaAPI } from "../services/api"
 import { obtenerNotas, crearNota as crearNotaAPI, eliminarNota as eliminarNotaAPI, actualizarNota } from "../services/api"
 
 // Iconos
