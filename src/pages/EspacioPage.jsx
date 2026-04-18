@@ -152,6 +152,7 @@ export default function EspacioPage() {
     console.log("ApiKey:", localStorage.getItem("apiKey"))
     const res = await crearNotaAPI("Nueva nota")
     console.log("Respuesta:", res)
+    console.log("Data de la nota:", res.data)
     if (res.exito && res.data) {
       const nueva = {
         id: res.data.id,
