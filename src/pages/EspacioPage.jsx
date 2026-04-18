@@ -147,25 +147,28 @@ export default function EspacioPage() {
   }
 
   const crearNota = async () => {
-    try {
-      const res = await crearNotaAPI("Nueva nota")
-      if (res.exito && res.data) {
-        const nueva = {
-          id: res.data.id,
-          titulo: "Nueva nota",
-          contenido: "",
-          fecha: new Date(res.data.creadoEn).toLocaleDateString("es-ES", {
-            day: "numeric", month: "short", year: "numeric"
-          })
-        }
-        setNotas([nueva, ...notas])
-        setNotaSeleccionada(nueva)
-        setMobileSidebarAbierto(false)
+  try {
+    console.log("Token:", localStorage.getItem("token"))
+    console.log("ApiKey:", localStorage.getItem("apiKey"))
+    const res = await crearNotaAPI("Nueva nota")
+    console.log("Respuesta:", res)
+    if (res.exito && res.data) {
+      const nueva = {
+        id: res.data.id,
+        titulo: "Nueva nota",
+        contenido: "",
+        fecha: new Date(res.data.creadoEn).toLocaleDateString("es-ES", {
+          day: "numeric", month: "short", year: "numeric"
+        })
       }
-    } catch (e) {
-      console.error("Error creando nota:", e)
+      setNotas([nueva, ...notas])
+      setNotaSeleccionada(nueva)
+      setMobileSidebarAbierto(false)
     }
+  } catch (e) {
+    console.error("Error creando nota:", e)
   }
+}
 
   const actualizarTitulo = (titulo) => {
     if (!notaSeleccionada) return
