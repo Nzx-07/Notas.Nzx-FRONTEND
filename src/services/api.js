@@ -70,3 +70,37 @@ export const actualizarNota = async (id, contenido) => {
   })
   return res.json()
 }
+
+// Carpetas
+export const obtenerCarpetas = async () => {
+  const res = await fetch(`${BASE_URL}/api/carpetas`, {
+    headers: headers(obtenerToken()),
+  })
+  return res.json()
+}
+
+export const crearCarpetaAPI = async (nombre) => {
+  const res = await fetch(`${BASE_URL}/api/carpetas`, {
+    method: "POST",
+    headers: headers(obtenerToken()),
+    body: JSON.stringify({ nombre }),
+  })
+  return res.json()
+}
+
+export const eliminarCarpetaAPI = async (id) => {
+  const res = await fetch(`${BASE_URL}/api/carpetas/${id}`, {
+    method: "DELETE",
+    headers: headers(obtenerToken()),
+  })
+  return res.json()
+}
+
+export const moverNotaACarpeta = async (notaId, carpetaId) => {
+  const res = await fetch(`${BASE_URL}/api/carpetas/mover-nota/${notaId}`, {
+    method: "PUT",
+    headers: headers(obtenerToken()),
+    body: JSON.stringify({ carpetaId }),
+  })
+  return res.json()
+}

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
 import EditorNotas from "../components/EditorNotas"
-import { obtenerNotas, crearNota as crearNotaAPI, eliminarNota as eliminarNotaAPI, actualizarNota } from "../services/api"
+import { obtenerNotas, crearNota as crearNotaAPI, eliminarNota as eliminarNotaAPI, actualizarNota, obtenerCarpetas, crearCarpetaAPI, eliminarCarpetaAPI, moverNotaACarpeta } from "../services/api"
 
 // Iconos
 const PlusIcon = ({ className }) => (
@@ -70,28 +70,24 @@ const MoonIcon = ({ className }) => (
   </svg>
 )
 
-const carpetasIniciales = []
-const notasIniciales = []
-
 export default function EspacioPage() {
   const [isDark, setIsDark] = useState(false)
   const [esBosque, setEsBosque] = useState(false)
   const [sidebarAbierto, setSidebarAbierto] = useState(true)
   const [mobileSidebarAbierto, setMobileSidebarAbierto] = useState(false)
-  const [notas, setNotas] = useState(notasIniciales)
-  const [carpetas, setCarpetas] = useState(carpetasIniciales)
+  const [notas, setNotas] = useState([])
+  const [carpetas, setCarpetas] = useState([])
   const [notaSeleccionada, setNotaSeleccionada] = useState(null)
   const [mostrarModalTema, setMostrarModalTema] = useState(false)
   const [menuContextual, setMenuContextual] = useState(null)
   const [modalEliminarCarpeta, setModalEliminarCarpeta] = useState(null)
   const [creandoCarpeta, setCreandoCarpeta] = useState(false)
   const [nombreNuevaCarpeta, setNombreNuevaCarpeta] = useState("")
-  const navigate = useNavigate()
   const [guardandoRef] = useState({ timeout: null })
+  const navigate = useNavigate()
 
   useEffect(() => {
     const saved = localStorage.getItem("tema")
-    // ✅ MODIFICADO: detectar tema bosque además de dark/noche
     if (saved === "dark" || saved === "noche") {
       document.documentElement.classList.add("dark")
       setIsDark(true)
@@ -99,45 +95,56 @@ export default function EspacioPage() {
       setEsBosque(true)
     }
 
-    const cargarNotas = async () => {
+    const cargarDatos = async () => {
       try {
-        const res = await obtenerNotas()
-        if (res.exito && res.data) {
-          const notasFormateadas = res.data.map(n => ({
+        const [resNotas, resCarpetas] = await Promise.all([
+          obtenerNotas(),
+          obtenerCarpetas()
+        ])
+
+        if (resNotas.exito && resNotas.data) {
+          const notasFormateadas = resNotas.data.map(n => ({
             id: n.id,
-            titulo: n.contenido?.split('\n')[0]?.replace(/<[^>]*>/g, '').substring(0, 50) || "Sin título",
+            titulo: n.contenido?.replace(/<[^>]*>/g, '').substring(0, 50) || "Sin título",
             contenido: n.contenido || "",
             fecha: new Date(n.creadoEn).toLocaleDateString("es-ES", {
               day: "numeric", month: "short", year: "numeric"
-            })
+            }),
+            carpetaId: n.carpetaId || undefined
           }))
           setNotas(notasFormateadas)
         }
+
+        if (resCarpetas.exito && resCarpetas.data) {
+          const carpetasFormateadas = resCarpetas.data.map(c => ({
+            id: c.id,
+            nombre: c.nombre,
+            abierta: true
+          }))
+          setCarpetas(carpetasFormateadas)
+        }
       } catch (e) {
-        console.error("Error cargando notas:", e)
+        console.error("Error cargando datos:", e)
       }
     }
 
-    cargarNotas()
+    cargarDatos()
 
     const cerrarMenu = () => setMenuContextual(null)
     window.addEventListener("click", cerrarMenu)
     return () => window.removeEventListener("click", cerrarMenu)
   }, [])
 
-  // ✅ MODIFICADO: toggleTema ahora maneja los 3 temas
   const aplicarTema = (tema) => {
     document.documentElement.classList.remove("dark")
     setIsDark(false)
     setEsBosque(false)
-
     if (tema === "noche") {
       document.documentElement.classList.add("dark")
       setIsDark(true)
     } else if (tema === "bosque") {
       setEsBosque(true)
     }
-
     localStorage.setItem("tema", tema)
     setMostrarModalTema(false)
   }
@@ -147,29 +154,25 @@ export default function EspacioPage() {
   }
 
   const crearNota = async () => {
-  try {
-    console.log("Token:", localStorage.getItem("token"))
-    console.log("ApiKey:", localStorage.getItem("apiKey"))
-    const res = await crearNotaAPI("Nueva nota")
-    console.log("Respuesta:", res)
-    console.log("Data de la nota:", res.data)
-    if (res.exito && res.data) {
-      const nueva = {
-        id: res.data.id,
-        titulo: "Nueva nota",
-        contenido: "",
-        fecha: new Date(res.data.creadoEn).toLocaleDateString("es-ES", {
-          day: "numeric", month: "short", year: "numeric"
-        })
+    try {
+      const res = await crearNotaAPI("Nueva nota")
+      if (res.exito && res.data) {
+        const nueva = {
+          id: res.data.id,
+          titulo: "Nueva nota",
+          contenido: "",
+          fecha: new Date(res.data.creadoEn).toLocaleDateString("es-ES", {
+            day: "numeric", month: "short", year: "numeric"
+          })
+        }
+        setNotas(prev => [nueva, ...prev])
+        setNotaSeleccionada(nueva)
+        setMobileSidebarAbierto(false)
       }
-      setNotas([nueva, ...notas])
-      setNotaSeleccionada(nueva)
-      setMobileSidebarAbierto(false)
+    } catch (e) {
+      console.error("Error creando nota:", e)
     }
-  } catch (e) {
-    console.error("Error creando nota:", e)
   }
-}
 
   const actualizarTitulo = (titulo) => {
     if (!notaSeleccionada) return
@@ -179,26 +182,24 @@ export default function EspacioPage() {
   }
 
   const actualizarContenido = (contenido) => {
-  if (!notaSeleccionada) return
-  const actualizada = { ...notaSeleccionada, contenido }
-  setNotaSeleccionada(actualizada)
-  setNotas(notas.map(n => n.id === actualizada.id ? actualizada : n))
-
-  // Guardado automático con debounce de 1 segundo
-  if (guardandoRef.timeout) clearTimeout(guardandoRef.timeout)
-  guardandoRef.timeout = setTimeout(async () => {
-    try {
-      await actualizarNota(actualizada.id, contenido)
-    } catch (e) {
-      console.error("Error guardando nota:", e)
-    }
-  }, 1000)
-}
+    if (!notaSeleccionada) return
+    const actualizada = { ...notaSeleccionada, contenido }
+    setNotaSeleccionada(actualizada)
+    setNotas(notas.map(n => n.id === actualizada.id ? actualizada : n))
+    if (guardandoRef.timeout) clearTimeout(guardandoRef.timeout)
+    guardandoRef.timeout = setTimeout(async () => {
+      try {
+        await actualizarNota(actualizada.id, contenido)
+      } catch (e) {
+        console.error("Error guardando nota:", e)
+      }
+    }, 1000)
+  }
 
   const eliminarNota = async (id) => {
     try {
       await eliminarNotaAPI(id)
-      setNotas(notas.filter(n => n.id !== id))
+      setNotas(prev => prev.filter(n => n.id !== id))
       if (notaSeleccionada?.id === id) setNotaSeleccionada(null)
       setMenuContextual(null)
     } catch (e) {
@@ -206,18 +207,30 @@ export default function EspacioPage() {
     }
   }
 
-  const crearCarpeta = () => {
+  const crearCarpeta = async () => {
     if (!nombreNuevaCarpeta.trim()) return
-    const nueva = { id: Date.now().toString(), nombre: nombreNuevaCarpeta.trim(), abierta: true }
-    setCarpetas([...carpetas, nueva])
-    setNombreNuevaCarpeta("")
-    setCreandoCarpeta(false)
+    try {
+      const res = await crearCarpetaAPI(nombreNuevaCarpeta.trim())
+      if (res.exito && res.data) {
+        const nueva = { id: res.data.id, nombre: res.data.nombre, abierta: true }
+        setCarpetas(prev => [...prev, nueva])
+        setNombreNuevaCarpeta("")
+        setCreandoCarpeta(false)
+      }
+    } catch (e) {
+      console.error("Error creando carpeta:", e)
+    }
   }
 
-  const eliminarCarpeta = (carpeta) => {
-    setCarpetas(carpetas.filter(c => c.id !== carpeta.id))
-    setNotas(notas.filter(n => n.carpetaId !== carpeta.id))
-    setModalEliminarCarpeta(null)
+  const eliminarCarpeta = async (carpeta) => {
+    try {
+      await eliminarCarpetaAPI(carpeta.id)
+      setCarpetas(prev => prev.filter(c => c.id !== carpeta.id))
+      setNotas(prev => prev.filter(n => n.carpetaId !== carpeta.id))
+      setModalEliminarCarpeta(null)
+    } catch (e) {
+      console.error("Error eliminando carpeta:", e)
+    }
   }
 
   const abrirMenuContextual = (e, nota) => {
@@ -228,7 +241,6 @@ export default function EspacioPage() {
   const notasSinCarpeta = notas.filter(n => !n.carpetaId)
   const notasEnCarpeta = (id) => notas.filter(n => n.carpetaId === id)
 
-  // ✅ AÑADIDO: helper para clases según tema
   const tc = {
     fondo: esBosque ? "bg-emerald-950" : "bg-white dark:bg-gray-900",
     sidebar: esBosque ? "bg-emerald-900 border-emerald-800" : "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700",
@@ -244,7 +256,6 @@ export default function EspacioPage() {
 
   const ContenidoSidebar = () => (
     <div className="flex h-full flex-col">
-      {/* ✅ MODIFICADO: colores del encabezado según tema */}
       <div className={`flex items-center justify-between border-b px-4 py-3 ${tc.borde}`}>
         <span className={`text-sm font-medium ${tc.texto}`}>Mi espacio</span>
         <div className="flex items-center gap-1">
@@ -259,7 +270,6 @@ export default function EspacioPage() {
         </div>
       </div>
 
-      {/* Input nueva carpeta */}
       {creandoCarpeta && (
         <div className="px-3 pt-3 pb-2">
           <input autoFocus type="text" value={nombreNuevaCarpeta}
@@ -275,7 +285,7 @@ export default function EspacioPage() {
       <div className="flex-1 overflow-y-auto px-3 py-3">
         {carpetas.map(carpeta => (
           <div key={carpeta.id} className="mb-1">
-            <div className={`group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm ${tc.textoMuted} ${tc.hover} hover:${tc.texto}`}>
+            <div className={`group flex w-full items-center gap-2 rounded-lg px-2 py-1.5 text-sm ${tc.textoMuted} ${tc.hover}`}>
               <button onClick={() => toggleCarpeta(carpeta.id)} className="flex flex-1 items-center gap-2">
                 <ChevronIcon className="h-3 w-3" isOpen={carpeta.abierta} />
                 <FolderIcon className="h-4 w-4" />
@@ -324,7 +334,6 @@ export default function EspacioPage() {
         )}
       </div>
 
-      {/* ✅ MODIFICADO: barra inferior con colores según tema */}
       <div className={`border-t px-2 py-2 ${tc.borde}`}>
         <div className="flex items-center justify-around">
           <button onClick={() => navigate("/perfil")}
@@ -345,9 +354,7 @@ export default function EspacioPage() {
   )
 
   return (
-    // ✅ MODIFICADO: fondo principal según tema
     <div className={`flex h-screen ${tc.fondo}`}>
-      {/* ✅ MODIFICADO: sidebar con colores según tema */}
       <aside className={`hidden border-r transition-all duration-300 md:flex md:flex-col ${tc.sidebar} ${sidebarAbierto ? "w-64" : "w-0 overflow-hidden border-r-0"}`}>
         <ContenidoSidebar />
       </aside>
@@ -356,7 +363,6 @@ export default function EspacioPage() {
         <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={() => setMobileSidebarAbierto(false)} />
       )}
 
-      {/* ✅ MODIFICADO: sidebar mobile con colores según tema */}
       <aside className={`fixed inset-y-0 left-0 z-50 w-72 transform border-r transition-transform duration-300 md:hidden ${tc.sidebar} ${mobileSidebarAbierto ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="absolute right-2 top-2">
           <button onClick={() => setMobileSidebarAbierto(false)}
@@ -368,7 +374,6 @@ export default function EspacioPage() {
       </aside>
 
       <main className="flex flex-1 flex-col overflow-hidden">
-        {/* ✅ MODIFICADO: header con colores según tema */}
         <header className={`flex h-12 items-center gap-2 border-b px-4 ${tc.header}`}>
           <button onClick={() => setMobileSidebarAbierto(true)}
             className={`flex h-8 w-8 items-center justify-center rounded-lg ${tc.textoMuted} ${tc.hover} md:hidden`}>
@@ -440,7 +445,8 @@ export default function EspacioPage() {
                 <div className="px-3 py-1.5 text-xs text-gray-400 dark:text-gray-500 font-medium">Mover a carpeta</div>
                 {carpetas.map(carpeta => (
                   <button key={carpeta.id}
-                    onClick={() => {
+                    onClick={async () => {
+                      await moverNotaACarpeta(menuContextual.nota.id, carpeta.id)
                       setNotas(notas.map(n => n.id === menuContextual.nota.id ? { ...n, carpetaId: carpeta.id } : n))
                       if (notaSeleccionada?.id === menuContextual.nota.id) {
                         setNotaSeleccionada({ ...notaSeleccionada, carpetaId: carpeta.id })
@@ -457,7 +463,8 @@ export default function EspacioPage() {
                 ))}
                 {menuContextual.nota.carpetaId && (
                   <button
-                    onClick={() => {
+                    onClick={async () => {
+                      await moverNotaACarpeta(menuContextual.nota.id, null)
                       setNotas(notas.map(n => n.id === menuContextual.nota.id ? { ...n, carpetaId: undefined } : n))
                       if (notaSeleccionada?.id === menuContextual.nota.id) {
                         setNotaSeleccionada({ ...notaSeleccionada, carpetaId: undefined })
@@ -511,7 +518,7 @@ export default function EspacioPage() {
         </>
       )}
 
-      {/* ✅ MODIFICADO: Modal tema con 3 opciones incluyendo Bosque */}
+      {/* Modal tema */}
       {mostrarModalTema && (
         <>
           <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setMostrarModalTema(false)} />
@@ -539,7 +546,6 @@ export default function EspacioPage() {
                   <p className="text-xs text-gray-500 dark:text-gray-400">Fondo negro, texto claro</p>
                 </div>
               </button>
-              {/* ✅ AÑADIDO: opción Bosque en el modal */}
               <button onClick={() => aplicarTema("bosque")}
                 className={`flex w-full items-center gap-3 rounded-lg border p-3 transition-colors ${esBosque ? "border-emerald-600 bg-emerald-50" : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-950 border border-emerald-800">
