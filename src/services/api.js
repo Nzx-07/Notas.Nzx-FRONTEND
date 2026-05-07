@@ -1,4 +1,4 @@
-const BASE_URL = "https://notasnzx-production.up.railway.app"
+const BASE_URL = "https://notas-nzx-api.onrender.com"
 
 const headers = (token = null, apiKey = null) => ({
   "Content-Type": "application/json",
