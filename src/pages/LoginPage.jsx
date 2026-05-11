@@ -55,6 +55,8 @@ export default function LoginPage() {
           const perfil = await obtenerPerfil()
           if (perfil.exito && perfil.data?.apiKey) {
             localStorage.setItem("apiKey", perfil.data.apiKey)
+            localStorage.setItem("plan", perfil.data.plan)
+            localStorage.setItem("tema", perfil.data.temaActivo)
           }
         } catch (e) {
           console.error("Error obteniendo perfil:", e)

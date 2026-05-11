@@ -104,3 +104,27 @@ export const moverNotaACarpeta = async (notaId, carpetaId) => {
   })
   return res.json()
 }
+
+// Temas
+export const obtenerTemas = async () => {
+  const res = await fetch(`${BASE_URL}/api/temas`, {
+    headers: headers(obtenerToken()),
+  })
+  return res.json()
+}
+
+export const activarTema = async (temaId) => {
+  const res = await fetch(`${BASE_URL}/api/temas/activar`, {
+    method: "PUT",
+    headers: headers(obtenerToken()),
+    body: JSON.stringify({ temaId }),
+  })
+  return res.json()
+}
+
+export const obtenerTemaActivo = async () => {
+  const res = await fetch(`${BASE_URL}/api/temas/activo`, {
+    headers: headers(obtenerToken()),
+  })
+  return res.json()
+}

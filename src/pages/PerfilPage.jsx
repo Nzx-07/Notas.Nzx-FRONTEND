@@ -54,6 +54,8 @@ export default function PerfilPage() {
           setPerfil(res.data)
           if (res.data.apiKey) {
             localStorage.setItem("apiKey", res.data.apiKey)
+            localStorage.setItem("plan", res.data.plan)
+            localStorage.setItem("tema", res.data.temaActivo)
           }
         }
       } catch (e) {
