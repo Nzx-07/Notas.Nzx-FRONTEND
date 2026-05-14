@@ -557,7 +557,7 @@ export default function EspacioPage() {
                 </div>
               </button>
             </div>
-            <button onClick={() => setMostrarModalTema(false)}
+            <button onClick={() => navigate("/galeria")}
               className="mt-4 w-full rounded-lg border border-gray-200 dark:border-gray-700 py-2 text-sm text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
               Cancelar
             </button>
