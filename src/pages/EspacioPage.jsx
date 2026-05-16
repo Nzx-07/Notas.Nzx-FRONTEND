@@ -340,7 +340,7 @@ export default function EspacioPage() {
             className={`flex h-9 w-9 items-center justify-center rounded-lg ${tc.textoMuted} transition-colors ${tc.hover}`}>
             <UserIcon className="h-5 w-5" />
           </button>
-          <button onClick={() => setMostrarModalTema(true)}
+          <button onClick={() => navigate("/galeria")}
             className={`flex h-9 w-9 items-center justify-center rounded-lg ${tc.textoMuted} transition-colors ${tc.hover}`}>
             <PaletteIcon className="h-5 w-5" />
           </button>
