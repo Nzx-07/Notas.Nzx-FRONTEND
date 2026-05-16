@@ -59,26 +59,32 @@ const LogoutIcon = ({ className }) => (
     <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15" />
   </svg>
 )
-const SunIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-  </svg>
-)
-const MoonIcon = ({ className }) => (
-  <svg className={className} fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
-    <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-  </svg>
-)
+
+// ✅ AÑADIDO: paletas de todos los temas
+const temasConfig = {
+  blanco:    { fondo: "bg-white", sidebar: "bg-gray-50 border-gray-200", header: "border-gray-200", texto: "text-gray-900", textoMuted: "text-gray-500", hover: "hover:bg-gray-100", notaActiva: "bg-gray-100 text-gray-900", notaHover: "hover:bg-gray-50", borde: "border-gray-200", input: "border-gray-200 bg-white text-gray-900 focus:ring-gray-900", botonNota: "bg-gray-900 text-white hover:bg-gray-700", iconoFondo: "bg-gray-100" },
+  noche:     { fondo: "bg-gray-900", sidebar: "bg-gray-900 border-gray-700", header: "border-gray-700", texto: "text-white", textoMuted: "text-gray-400", hover: "hover:bg-gray-800", notaActiva: "bg-gray-800 text-white", notaHover: "hover:bg-gray-800/50", borde: "border-gray-700", input: "border-gray-700 bg-gray-800 text-white focus:ring-white", botonNota: "bg-white text-gray-900 hover:bg-gray-100", iconoFondo: "bg-gray-800" },
+  bosque:    { fondo: "bg-emerald-950", sidebar: "bg-emerald-900 border-emerald-800", header: "bg-emerald-950 border-emerald-800", texto: "text-emerald-50", textoMuted: "text-emerald-300", hover: "hover:bg-emerald-800", notaActiva: "bg-emerald-800 text-emerald-50", notaHover: "hover:bg-emerald-800/50", borde: "border-emerald-800", input: "border-emerald-700 bg-emerald-900 text-emerald-50 focus:ring-emerald-500", botonNota: "bg-emerald-700 text-emerald-50 hover:bg-emerald-600", iconoFondo: "bg-emerald-900" },
+  aurora:    { fondo: "bg-indigo-950", sidebar: "bg-indigo-900 border-indigo-800", header: "bg-indigo-950 border-indigo-800", texto: "text-indigo-50", textoMuted: "text-indigo-300", hover: "hover:bg-indigo-800", notaActiva: "bg-indigo-800 text-indigo-50", notaHover: "hover:bg-indigo-800/50", borde: "border-indigo-800", input: "border-indigo-700 bg-indigo-900 text-indigo-50 focus:ring-indigo-500", botonNota: "bg-indigo-700 text-indigo-50 hover:bg-indigo-600", iconoFondo: "bg-indigo-900" },
+  desierto:  { fondo: "bg-orange-950", sidebar: "bg-orange-900 border-orange-800", header: "bg-orange-950 border-orange-800", texto: "text-orange-50", textoMuted: "text-orange-300", hover: "hover:bg-orange-800", notaActiva: "bg-orange-800 text-orange-50", notaHover: "hover:bg-orange-800/50", borde: "border-orange-800", input: "border-orange-700 bg-orange-900 text-orange-50 focus:ring-orange-500", botonNota: "bg-orange-700 text-orange-50 hover:bg-orange-600", iconoFondo: "bg-orange-900" },
+  oceano:    { fondo: "bg-sky-950", sidebar: "bg-sky-900 border-sky-800", header: "bg-sky-950 border-sky-800", texto: "text-sky-50", textoMuted: "text-sky-300", hover: "hover:bg-sky-800", notaActiva: "bg-sky-800 text-sky-50", notaHover: "hover:bg-sky-800/50", borde: "border-sky-800", input: "border-sky-700 bg-sky-900 text-sky-50 focus:ring-sky-500", botonNota: "bg-sky-700 text-sky-50 hover:bg-sky-600", iconoFondo: "bg-sky-900" },
+  volcan:    { fondo: "bg-red-950", sidebar: "bg-red-900 border-red-800", header: "bg-red-950 border-red-800", texto: "text-red-50", textoMuted: "text-red-300", hover: "hover:bg-red-800", notaActiva: "bg-red-800 text-red-50", notaHover: "hover:bg-red-800/50", borde: "border-red-800", input: "border-red-700 bg-red-900 text-red-50 focus:ring-red-500", botonNota: "bg-red-700 text-red-50 hover:bg-red-600", iconoFondo: "bg-red-900" },
+  niebla:    { fondo: "bg-slate-100", sidebar: "bg-slate-200 border-slate-300", header: "border-slate-300", texto: "text-slate-800", textoMuted: "text-slate-500", hover: "hover:bg-slate-300", notaActiva: "bg-slate-300 text-slate-800", notaHover: "hover:bg-slate-200", borde: "border-slate-300", input: "border-slate-300 bg-slate-100 text-slate-800 focus:ring-slate-500", botonNota: "bg-slate-700 text-white hover:bg-slate-600", iconoFondo: "bg-slate-300" },
+  cafe:      { fondo: "bg-stone-950", sidebar: "bg-stone-900 border-stone-700", header: "bg-stone-950 border-stone-700", texto: "text-amber-50", textoMuted: "text-amber-200", hover: "hover:bg-stone-800", notaActiva: "bg-stone-800 text-amber-50", notaHover: "hover:bg-stone-800/50", borde: "border-stone-700", input: "border-stone-700 bg-stone-900 text-amber-50 focus:ring-amber-500", botonNota: "bg-amber-700 text-amber-50 hover:bg-amber-600", iconoFondo: "bg-stone-800" },
+  sakura:    { fondo: "bg-pink-50", sidebar: "bg-rose-100 border-rose-200", header: "border-rose-200", texto: "text-rose-900", textoMuted: "text-rose-400", hover: "hover:bg-rose-200", notaActiva: "bg-rose-200 text-rose-900", notaHover: "hover:bg-rose-100", borde: "border-rose-200", input: "border-rose-200 bg-pink-50 text-rose-900 focus:ring-rose-400", botonNota: "bg-rose-600 text-white hover:bg-rose-700", iconoFondo: "bg-rose-100" },
+  obsidiana: { fondo: "bg-zinc-950", sidebar: "bg-zinc-900 border-purple-900", header: "bg-zinc-950 border-purple-900", texto: "text-zinc-100", textoMuted: "text-purple-300", hover: "hover:bg-purple-950", notaActiva: "bg-purple-950 text-zinc-100", notaHover: "hover:bg-purple-950/50", borde: "border-purple-900", input: "border-purple-900 bg-zinc-900 text-zinc-100 focus:ring-purple-500", botonNota: "bg-purple-800 text-zinc-100 hover:bg-purple-700", iconoFondo: "bg-zinc-900" },
+  menta:     { fondo: "bg-green-50", sidebar: "bg-green-100 border-green-200", header: "border-green-200", texto: "text-green-900", textoMuted: "text-green-500", hover: "hover:bg-green-200", notaActiva: "bg-green-200 text-green-900", notaHover: "hover:bg-green-100", borde: "border-green-200", input: "border-green-200 bg-green-50 text-green-900 focus:ring-green-500", botonNota: "bg-green-700 text-white hover:bg-green-800", iconoFondo: "bg-green-100" },
+  lavanda:   { fondo: "bg-purple-50", sidebar: "bg-purple-100 border-purple-200", header: "border-purple-200", texto: "text-purple-900", textoMuted: "text-purple-400", hover: "hover:bg-purple-200", notaActiva: "bg-purple-200 text-purple-900", notaHover: "hover:bg-purple-100", borde: "border-purple-200", input: "border-purple-200 bg-purple-50 text-purple-900 focus:ring-purple-400", botonNota: "bg-purple-700 text-white hover:bg-purple-800", iconoFondo: "bg-purple-100" },
+}
 
 export default function EspacioPage() {
-  const [isDark, setIsDark] = useState(false)
-  const [esBosque, setEsBosque] = useState(false)
+  // ✅ MODIFICADO: reemplazados isDark y esBosque por temaActual
+  const [temaActual, setTemaActual] = useState(localStorage.getItem("tema") || "blanco")
   const [sidebarAbierto, setSidebarAbierto] = useState(true)
   const [mobileSidebarAbierto, setMobileSidebarAbierto] = useState(false)
   const [notas, setNotas] = useState([])
   const [carpetas, setCarpetas] = useState([])
   const [notaSeleccionada, setNotaSeleccionada] = useState(null)
-  const [mostrarModalTema, setMostrarModalTema] = useState(false)
   const [menuContextual, setMenuContextual] = useState(null)
   const [modalEliminarCarpeta, setModalEliminarCarpeta] = useState(null)
   const [creandoCarpeta, setCreandoCarpeta] = useState(false)
@@ -87,13 +93,9 @@ export default function EspacioPage() {
   const navigate = useNavigate()
 
   useEffect(() => {
-    const saved = localStorage.getItem("tema")
-    if (saved === "dark" || saved === "noche") {
-      document.documentElement.classList.add("dark")
-      setIsDark(true)
-    } else if (saved === "bosque") {
-      setEsBosque(true)
-    }
+    // ✅ MODIFICADO: cargar tema desde localStorage
+    const saved = localStorage.getItem("tema") || "blanco"
+    setTemaActual(saved)
 
     const cargarDatos = async () => {
       try {
@@ -101,7 +103,6 @@ export default function EspacioPage() {
           obtenerNotas(),
           obtenerCarpetas()
         ])
-
         if (resNotas.exito && resNotas.data) {
           const notasFormateadas = resNotas.data.map(n => ({
             id: n.id,
@@ -114,7 +115,6 @@ export default function EspacioPage() {
           }))
           setNotas(notasFormateadas)
         }
-
         if (resCarpetas.exito && resCarpetas.data) {
           const carpetasFormateadas = resCarpetas.data.map(c => ({
             id: c.id,
@@ -134,20 +134,6 @@ export default function EspacioPage() {
     window.addEventListener("click", cerrarMenu)
     return () => window.removeEventListener("click", cerrarMenu)
   }, [])
-
-  const aplicarTema = (tema) => {
-    document.documentElement.classList.remove("dark")
-    setIsDark(false)
-    setEsBosque(false)
-    if (tema === "noche") {
-      document.documentElement.classList.add("dark")
-      setIsDark(true)
-    } else if (tema === "bosque") {
-      setEsBosque(true)
-    }
-    localStorage.setItem("tema", tema)
-    setMostrarModalTema(false)
-  }
 
   const toggleCarpeta = (id) => {
     setCarpetas(carpetas.map(c => c.id === id ? { ...c, abierta: !c.abierta } : c))
@@ -241,18 +227,8 @@ export default function EspacioPage() {
   const notasSinCarpeta = notas.filter(n => !n.carpetaId)
   const notasEnCarpeta = (id) => notas.filter(n => n.carpetaId === id)
 
-  const tc = {
-    fondo: esBosque ? "bg-emerald-950" : "bg-white dark:bg-gray-900",
-    sidebar: esBosque ? "bg-emerald-900 border-emerald-800" : "bg-gray-50 dark:bg-gray-900 border-gray-200 dark:border-gray-700",
-    header: esBosque ? "bg-emerald-950 border-emerald-800" : "border-gray-200 dark:border-gray-700",
-    texto: esBosque ? "text-emerald-50" : "text-gray-900 dark:text-white",
-    textoMuted: esBosque ? "text-emerald-300" : "text-gray-500 dark:text-gray-400",
-    hover: esBosque ? "hover:bg-emerald-800" : "hover:bg-gray-100 dark:hover:bg-gray-800",
-    notaActiva: esBosque ? "bg-emerald-800 text-emerald-50" : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white",
-    notaHover: esBosque ? "hover:bg-emerald-800/50" : "hover:bg-gray-50 dark:hover:bg-gray-800/50",
-    borde: esBosque ? "border-emerald-800" : "border-gray-200 dark:border-gray-700",
-    input: esBosque ? "border-emerald-700 bg-emerald-900 text-emerald-50 focus:ring-emerald-500" : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-gray-900 dark:focus:ring-white",
-  }
+  // ✅ MODIFICADO: tc ahora usa temasConfig según temaActual
+  const tc = temasConfig[temaActual] || temasConfig.blanco
 
   const ContenidoSidebar = () => (
     <div className="flex h-full flex-col">
@@ -413,13 +389,13 @@ export default function EspacioPage() {
             </div>
           ) : (
             <div className="flex h-full flex-col items-center justify-center px-4">
-              <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${esBosque ? "bg-emerald-900" : "bg-gray-100 dark:bg-gray-800"}`}>
+              <div className={`flex h-16 w-16 items-center justify-center rounded-2xl ${tc.iconoFondo}`}>
                 <DocumentIcon className={`h-8 w-8 ${tc.textoMuted}`} />
               </div>
               <h2 className={`mt-4 text-lg font-medium ${tc.texto}`}>No hay nota seleccionada</h2>
               <p className={`mt-1 text-center text-sm ${tc.textoMuted}`}>Selecciona una nota o crea una nueva</p>
               <button onClick={crearNota}
-                className={`mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${esBosque ? "bg-emerald-700 text-emerald-50 hover:bg-emerald-600" : "bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700"}`}>
+                className={`mt-4 flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium ${tc.botonNota}`}>
                 <PlusIcon className="h-4 w-4" />
                 Nueva nota
               </button>
@@ -435,14 +411,14 @@ export default function EspacioPage() {
           <div className="fixed z-50 w-52 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-lg py-1"
             style={{ top: menuContextual.y, left: menuContextual.x }}>
             {carpetas.length === 0 ? (
-              <div className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 dark:text-gray-600 cursor-not-allowed">
+              <div className="flex items-center gap-2 px-3 py-2 text-sm text-gray-300 cursor-not-allowed">
                 <FolderIcon className="h-4 w-4" />
                 <span>Mover a carpeta</span>
                 <span className="ml-auto text-xs">(sin carpetas)</span>
               </div>
             ) : (
               <>
-                <div className="px-3 py-1.5 text-xs text-gray-400 dark:text-gray-500 font-medium">Mover a carpeta</div>
+                <div className="px-3 py-1.5 text-xs text-gray-400 font-medium">Mover a carpeta</div>
                 {carpetas.map(carpeta => (
                   <button key={carpeta.id}
                     onClick={async () => {
@@ -453,7 +429,7 @@ export default function EspacioPage() {
                       }
                       setMenuContextual(null)
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                     <FolderIcon className="h-4 w-4 text-gray-400" />
                     {carpeta.nombre}
                     {menuContextual.nota.carpetaId === carpeta.id && (
@@ -471,16 +447,16 @@ export default function EspacioPage() {
                       }
                       setMenuContextual(null)
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800">
+                    className="flex w-full items-center gap-2 px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
                     <DocumentIcon className="h-4 w-4 text-gray-400" />
                     Sin carpeta
                   </button>
                 )}
               </>
             )}
-            <div className="my-1 border-t border-gray-100 dark:border-gray-800" />
+            <div className="my-1 border-t border-gray-100" />
             <button onClick={() => eliminarNota(menuContextual.nota.id)}
-              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20">
+              className="flex w-full items-center gap-2 px-3 py-2 text-sm text-red-500 hover:bg-red-50">
               <TrashIcon className="h-4 w-4" />
               Eliminar nota
             </button>
@@ -492,21 +468,21 @@ export default function EspacioPage() {
       {modalEliminarCarpeta && (
         <>
           <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setModalEliminarCarpeta(null)} />
-          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Eliminar carpeta</h3>
-            <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
+            <h3 className="text-lg font-semibold text-gray-900">Eliminar carpeta</h3>
+            <p className="mt-2 text-sm text-gray-500">
               ¿Eliminar la carpeta <strong>"{modalEliminarCarpeta.nombre}"</strong>?
             </p>
             {notasEnCarpeta(modalEliminarCarpeta.id).length > 0 && (
-              <div className="mt-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 px-3 py-2">
-                <p className="text-sm text-amber-700 dark:text-amber-400">
+              <div className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+                <p className="text-sm text-amber-700">
                   ⚠️ Esta carpeta contiene <strong>{notasEnCarpeta(modalEliminarCarpeta.id).length} nota(s)</strong> que también se eliminarán.
                 </p>
               </div>
             )}
             <div className="mt-4 flex gap-3">
               <button onClick={() => setModalEliminarCarpeta(null)}
-                className="flex-1 rounded-lg border border-gray-200 dark:border-gray-700 py-2 text-sm text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800">
+                className="flex-1 rounded-lg border border-gray-200 py-2 text-sm text-gray-500 hover:bg-gray-50">
                 Cancelar
               </button>
               <button onClick={() => eliminarCarpeta(modalEliminarCarpeta)}
@@ -514,53 +490,6 @@ export default function EspacioPage() {
                 Eliminar
               </button>
             </div>
-          </div>
-        </>
-      )}
-
-      {/* Modal tema */}
-      {mostrarModalTema && (
-        <>
-          <div className="fixed inset-0 z-50 bg-black/50" onClick={() => setMostrarModalTema(false)} />
-          <div className="fixed left-1/2 top-1/2 z-50 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-6 shadow-lg">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Cambiar tema</h3>
-            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">Elige cómo quieres ver tu espacio</p>
-            <div className="mt-4 space-y-2">
-              <button onClick={() => aplicarTema("blanco")}
-                className={`flex w-full items-center gap-3 rounded-lg border p-3 transition-colors ${!isDark && !esBosque ? "border-gray-900 bg-gray-50" : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-white border border-gray-200">
-                  <SunIcon className="h-5 w-5 text-gray-700" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Blanco</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Fondo blanco, texto oscuro</p>
-                </div>
-              </button>
-              <button onClick={() => aplicarTema("noche")}
-                className={`flex w-full items-center gap-3 rounded-lg border p-3 transition-colors ${isDark ? "border-gray-900 dark:border-white bg-gray-50 dark:bg-gray-800" : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gray-900 border border-gray-700">
-                  <MoonIcon className="h-5 w-5 text-gray-100" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Noche</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Fondo negro, texto claro</p>
-                </div>
-              </button>
-              <button onClick={() => aplicarTema("bosque")}
-                className={`flex w-full items-center gap-3 rounded-lg border p-3 transition-colors ${esBosque ? "border-emerald-600 bg-emerald-50" : "border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800"}`}>
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-950 border border-emerald-800">
-                  <div className="h-5 w-5 rounded-full bg-emerald-500" />
-                </div>
-                <div className="text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Bosque</p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">Tonos verdes naturales</p>
-                </div>
-              </button>
-            </div>
-            <button onClick={() => navigate("/galeria")}
-              className="mt-4 w-full rounded-lg border border-gray-200 dark:border-gray-700 py-2 text-sm text-gray-500 dark:text-gray-400 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800">
-              Cancelar
-            </button>
           </div>
         </>
       )}
