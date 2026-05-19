@@ -165,6 +165,16 @@ export default function EspacioPage() {
     const actualizada = { ...notaSeleccionada, titulo }
     setNotaSeleccionada(actualizada)
     setNotas(notas.map(n => n.id === actualizada.id ? actualizada : n))
+
+    //guardado automatico del titulo
+    if (guardandoRef.timeout) clearTimeout(guardandoRef.timeout)
+      guardandoRef.timeout = setTimeout(async () => {
+        try {
+          await actualizarNota(actualizada.id, actualizada.contenido)
+        } catch (e) {
+          console.error("Error guardando titulo", e)
+        }
+    }, 1000)
   }
 
   const actualizarContenido = (contenido) => {
